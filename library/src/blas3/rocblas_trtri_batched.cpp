@@ -128,7 +128,6 @@ namespace
 
         return status;
     }
-
 }
 
 extern "C" {

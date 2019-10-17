@@ -15,8 +15,7 @@
 /*******************************************************************************
  * Helper enumeration over different transpose combinations
  ******************************************************************************/
-typedef enum transpose_mode_
-{
+typedef enum transpose_mode_ {
     // First letter refers to A, second letter refers to B
     NN,
     NT,
@@ -383,8 +382,8 @@ hipError_t call_tensile(const T*          alpha,
                         rocblas_int       sizeL,
                         rocblas_handle    handle)
 {
-    // Currently alpha and beta can only be single values as
-    // tensile does not support arrays for scalars yet.
+// Currently alpha and beta can only be single values as
+// tensile does not support arrays for scalars yet.
 #ifndef NDEBUG
     std::cout << "Solution Name: "
               << tensileGetSolutionName<T>(trans_a,

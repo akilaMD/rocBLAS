@@ -193,8 +193,8 @@ __global__ void
                                                    rocblas_stride stridex,
                                                    To*            workspace)
 {
-    ptrdiff_t     tx  = hipThreadIdx_x;
-    ptrdiff_t     tid = hipBlockIdx_x * hipBlockDim_x + tx;
+    ptrdiff_t  tx  = hipThreadIdx_x;
+    ptrdiff_t  tid = hipBlockIdx_x * hipBlockDim_x + tx;
     __shared__ To tmp[NB];
 
     const Ti* x = load_ptr_batch(xvec, hipBlockIdx_y, shiftx, stridex);
@@ -223,7 +223,7 @@ __attribute__((amdgpu_flat_work_group_size((NB < 128) ? NB : 128, (NB > 256) ? N
 __global__ void
     rocblas_reduction_strided_batched_kernel_part2(rocblas_int nblocks, To* workspace, Tr* result)
 {
-    rocblas_int   tx = hipThreadIdx_x;
+    rocblas_int tx = hipThreadIdx_x;
     __shared__ To tmp[NB];
 
     if(tx < nblocks)

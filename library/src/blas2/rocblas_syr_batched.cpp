@@ -102,7 +102,6 @@ namespace
         return rocblas_syr_batched_template(
             handle, uplo, n, alpha, 0, x, 0, incx, A, 0, lda, batch_count);
     }
-
 }
 
 /*

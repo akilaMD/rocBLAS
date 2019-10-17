@@ -105,7 +105,8 @@ struct Arguments
         else if(strcmp(trailer, "ROCblas"))
             error("trailer");
 
-        auto check_func = [&, sig = (unsigned char)0](const auto& elem, auto name) mutable {
+        auto check_func = [&, sig = (unsigned char)0 ](const auto& elem, auto name) mutable
+        {
             static_assert(sizeof(elem) <= 255,
                           "One of the fields of Arguments is too large (> 255 bytes)");
             for(unsigned char i = 0; i < sizeof(elem); ++i)
@@ -261,7 +262,8 @@ private:
     friend std::ostream& operator<<(std::ostream& str, const Arguments& arg)
     {
         // delim starts as '{' opening brace and becomes ',' afterwards
-        auto print = [&, delim = '{'](const char* name, auto x) mutable {
+        auto print = [&, delim = '{' ](const char* name, auto x) mutable
+        {
             str << delim << " " << name << ": ";
             print_value(str, x);
             delim = ',';

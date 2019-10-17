@@ -66,7 +66,7 @@ void testing_dot_strided_batched_bad_arg(const Arguments& arg)
     EXPECT_ROCBLAS_STATUS(
         (CONJ ? rocblas_dotc_strided_batched<T>
               : rocblas_dot_strided_batched<
-                  T>)(handle, N, dx, incx, stride_x, dy, incy, stride_y, batch_count, nullptr),
+                    T>)(handle, N, dx, incx, stride_x, dy, incy, stride_y, batch_count, nullptr),
         rocblas_status_invalid_pointer);
     EXPECT_ROCBLAS_STATUS(
         (CONJ ? rocblas_dotc_strided_batched<T> : rocblas_dot_strided_batched<T>)(nullptr,

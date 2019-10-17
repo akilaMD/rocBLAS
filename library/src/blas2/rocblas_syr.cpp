@@ -84,7 +84,6 @@ namespace
 
         return rocblas_syr_template(handle, uplo, n, alpha, x, incx, A, lda);
     }
-
 }
 /*
  * ===========================================================================

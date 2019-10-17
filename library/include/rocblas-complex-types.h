@@ -184,8 +184,8 @@ public:
     }
 
     friend __device__ __host__ rocblas_complex_num std::conj(const rocblas_complex_num& z);
-    friend __device__ __host__ T                   std::norm(const rocblas_complex_num& z);
-    friend __device__ __host__ T                   std::abs(const rocblas_complex_num<T>& z);
+    friend __device__ __host__ T std::norm(const rocblas_complex_num& z);
+    friend __device__ __host__ T std::abs(const rocblas_complex_num<T>& z);
 
     // in-place complex-complex operations
     __device__ __host__ auto& operator*=(const rocblas_complex_num& rhs)

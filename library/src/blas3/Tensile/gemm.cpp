@@ -317,7 +317,6 @@ namespace
 
         return validArgs;
     }
-
 }
 
 extern "C" {

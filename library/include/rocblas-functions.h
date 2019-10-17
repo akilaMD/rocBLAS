@@ -1756,10 +1756,10 @@ ROCBLAS_EXPORT rocblas_status rocblas_zdrot_strided_batched(rocblas_handle      
     ********************************************************************/
 
 ROCBLAS_EXPORT rocblas_status
-    rocblas_srotg(rocblas_handle handle, float* a, float* b, float* c, float* s);
+               rocblas_srotg(rocblas_handle handle, float* a, float* b, float* c, float* s);
 
 ROCBLAS_EXPORT rocblas_status
-    rocblas_drotg(rocblas_handle handle, double* a, double* b, double* c, double* s);
+               rocblas_drotg(rocblas_handle handle, double* a, double* b, double* c, double* s);
 
 ROCBLAS_EXPORT rocblas_status rocblas_crotg(rocblas_handle         handle,
                                             rocblas_float_complex* a,

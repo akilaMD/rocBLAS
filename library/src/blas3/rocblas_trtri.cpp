@@ -83,7 +83,6 @@ namespace
                                                            1,
                                                            (T*)mem);
     }
-
 }
 
 /*
