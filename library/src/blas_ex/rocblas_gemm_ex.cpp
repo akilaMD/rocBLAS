@@ -392,7 +392,6 @@ namespace
 
         return rb_status;
     }
-
 }
 
 extern "C" rocblas_status rocblas_gemm_ex(rocblas_handle    handle,

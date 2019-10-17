@@ -188,8 +188,7 @@ extern "C" rocblas_status rocblas_set_vector(rocblas_int n,
                                              const void* x_h,
                                              rocblas_int incx,
                                              void*       y_d,
-                                             rocblas_int incy)
-try
+                                             rocblas_int incy) try
 {
     if(n == 0) // quick return
         return rocblas_status_success;
@@ -316,8 +315,7 @@ extern "C" rocblas_status rocblas_get_vector(rocblas_int n,
                                              const void* x_d,
                                              rocblas_int incx,
                                              void*       y_h,
-                                             rocblas_int incy)
-try
+                                             rocblas_int incy) try
 {
     if(n == 0) // quick return
         return rocblas_status_success;
@@ -474,8 +472,7 @@ extern "C" rocblas_status rocblas_set_matrix(rocblas_int rows,
                                              const void* a_h,
                                              rocblas_int lda,
                                              void*       b_d,
-                                             rocblas_int ldb)
-try
+                                             rocblas_int ldb) try
 {
     if(rows == 0 || cols == 0) // quick return
         return rocblas_status_success;
@@ -625,8 +622,7 @@ extern "C" rocblas_status rocblas_get_matrix(rocblas_int rows,
                                              const void* a_d,
                                              rocblas_int lda,
                                              void*       b_h,
-                                             rocblas_int ldb)
-try
+                                             rocblas_int ldb) try
 {
     if(rows == 0 || cols == 0) // quick return
         return rocblas_status_success;

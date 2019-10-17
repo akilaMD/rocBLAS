@@ -82,7 +82,6 @@ namespace
         return rocblas_asum_strided_batched_template<NB>(
             handle, n, x, 0, incx, stridex, batch_count, (To*)mem, results);
     }
-
 }
 
 /*

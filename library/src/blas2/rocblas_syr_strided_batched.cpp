@@ -122,7 +122,6 @@ namespace
         return rocblas_syr_strided_batched_template(
             handle, uplo, n, alpha, 0, x, 0, incx, stridex, A, 0, lda, strideA, batch_count);
     }
-
 }
 
 /*
