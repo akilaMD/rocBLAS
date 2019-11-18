@@ -82,7 +82,7 @@ endif()
 
 if( CXX_VERSION_STRING MATCHES "clang" )
   message( STATUS "Use hip-clang to build for amdgpu backend" )
-# set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -fallow-half-arguments-and-returns" )
+  set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem ${CMAKE_SOURCE_DIR}/library/include -Xclang" )
   set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__HIP_HCC_COMPAT_MODE__=1" )
 elseif( CXX_VERSION_STRING MATCHES "nvcc" )
   message( STATUS "HIPCC nvcc compiler detected; CUDA backend selected" )

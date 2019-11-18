@@ -158,7 +158,7 @@ install_packages( )
 
   # dependencies to build the client
   local client_dependencies_ubuntu=( "gfortran" "libomp-dev" "libboost-program-options-dev")
-  local client_dependencies_centos=( "gcc-gfortran" "libgomp" "boost-devel")
+  local client_dependencies_centos=( "gcc-gfortran" "libgomp" "boost-devel" "devtoolset-7-gcc-c++")
   local client_dependencies_fedora=( "gcc-gfortran" "libgomp" "boost-devel")
   local client_dependencies_sles=( "gcc-fortran" "libgomp1" "libboost_program_options1_66_0-devel" "boost-devel")
 
@@ -383,15 +383,14 @@ if [[ "${install_dependencies}" == true ]]; then
       git submodule update --init
       cd extern/blis
       case "${ID}" in
-          centos|rhel|sles)
-              ./configure --prefix=../../${build_dir}/deps/blis --enable-threading=openmp auto
+          centos|rhel)
+              ./configure --prefix=../../${build_dir}/deps/blis --enable-threading=openmp CC=/opt/rh/devtoolset-7/root/usr/bin/gcc auto
               ;;
-          ubuntu)
+          sles|ubuntu)
               ./configure --prefix=../../${build_dir}/deps/blis --enable-threading=openmp CC=/opt/rocm/hcc/bin/clang auto
               ;;
           *)
               echo "Unsupported OS for this script"
-              ./configure --prefix=../../${build_dir}/deps/blis --enable-threading=openmp auto
               ;;
       esac
       make install
@@ -400,30 +399,11 @@ if [[ "${install_dependencies}" == true ]]; then
   fi
 fi
 
-if [[ "${cpu_ref_lib}" == blis ]] && [[ ! -f "${build_dir}/deps/blis/lib/libblis.so" ]] && [[ "${build_clients}" == true ]]; then
-  git submodule update --init
-  cd extern/blis
-  case "${ID}" in
-    centos|rhel|sles)
-      ./configure --prefix=../../${build_dir}/deps/blis --enable-threading=openmp auto
-      ;;
-    ubuntu)
-      ./configure --prefix=../../${build_dir}/deps/blis --enable-threading=openmp CC=/opt/rocm/hcc/bin/clang auto
-      ;;
-    *)
-      echo "Unsupported OS for this script"
-      ./configure --prefix=../../${build_dir}/deps/blis --enable-threading=openmp auto
-      ;;
-  esac
-  make install
-  cd ../..
-fi
-
 # We append customary rocm path; if user provides custom rocm path in ${path}, our
 # hard-coded path has lesser priority
 export PATH=${PATH}:/opt/rocm/bin
-
 pushd .
+
   # #################################################
   # configure & build
   # #################################################

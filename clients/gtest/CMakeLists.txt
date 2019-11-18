@@ -107,8 +107,9 @@ set( BLIS_LIBRARY ${CMAKE_SOURCE_DIR}/build/deps/blis/lib/libblis.so )
 
 if( OS_ID_rhel OR OS_ID_centos OR OS_ID_sles)
     if( OS_ID_rhel OR OS_ID_centos)
-        # defer OpenMP include as search order must come after clang
-        set( XXX_OPENMP_INCLUDE_DIR /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/include )
+	# defer OpenMP include as search order must come after clang
+        SET( TYPE_DIR ${CMAKE_SOURCE_DIR}/library/include )
+	set( XXX_OPENMP_INCLUDE_DIR /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/include )
         set( OPENMP_LIBRARY /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/libgomp.so )
     else()
     #SLES
@@ -127,6 +128,7 @@ if( OS_ID_rhel OR OS_ID_centos OR OS_ID_sles)
     # External header includes included as system files
     target_include_directories( rocblas-test
       SYSTEM PRIVATE
+        $<BUILD_INTERFACE:${TYPE_DIR}>
         $<BUILD_INTERFACE:${CLANG_INCLUDE_DIR}>
         $<BUILD_INTERFACE:${BLIS_INCLUDE_DIR}>
         $<BUILD_INTERFACE:${HIP_INCLUDE_DIRS}>
@@ -200,11 +202,11 @@ endif( )
 
 if( OS_ID_rhel OR OS_ID_centos)
     # force clang includes to take precedence over devtoolset-7 which we only want for OpenMP
-    set(CMAKE_CXX_FLAGS "-isystem ${CLANG_INCLUDE_DIR} -isystem ${XXX_OPENMP_INCLUDE_DIR} ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-isystem ${TYPE_DIR} -isystem ${CLANG_INCLUDE_DIR} -isystem ${XXX_OPENMP_INCLUDE_DIR} -isystem /opt/rocm/include ${CMAKE_CXX_FLAGS}")
+else()
+    # include order workaround to force /opt/rocm/include later in order to ignore installed rocblas
+    set(CMAKE_CXX_FLAGS "-isystem /opt/rocm/include ${CMAKE_CXX_FLAGS}")
 endif()
-
-# include order workaround to force /opt/rocm/include later in order to ignore installed rocblas
-set(CMAKE_CXX_FLAGS "-isystem /opt/rocm/include ${CMAKE_CXX_FLAGS}")
 
 if( CXX_VERSION_STRING MATCHES "clang" )
   target_link_libraries( rocblas-test PRIVATE -lpthread -lm )
