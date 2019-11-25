@@ -19,6 +19,8 @@ tuningCI:
     // Define test architectures, optional rocm version argument is available
     def nodes = new dockerNodes(['ubuntu18 && mi25', 'ubuntu18 && mi50', 'ubuntu18 && mi60', 'ubuntu18 && v340'], tuning)
 
+    String user = "amdkila"
+
     def setupCommand =
     {
         platform, project->
@@ -26,12 +28,14 @@ tuningCI:
         project.paths.construct_build_prefix()
         
         def tensile = platform.checkoutSecondaryProject("Tensile")
-        def remote = project.tune.addRemote("Tensile","amdkila","local")
+        String remote = project.tune.addRemote("Tensile",user,"local")
+        String branch = project.tune.random()
+
         def command = """#!/usr/bin/env bash
                     set -x
                     cd ${project.paths.project_build_prefix}
                     ${remote}
-                    git checkout -b ${new_branch}
+                    git checkout -b ${branch}
                     git clone ${tensile}
                     """
         
@@ -45,10 +49,13 @@ tuningCI:
         project.paths.construct_build_prefix()
 
         String log = "*"
+        String filename = project.tune.getFilenames("${project.paths.project_build_prefix}/Tensile")
         def command = """#!/usr/bin/env bash
                     set -x
-                    cd ${project.paths.project_build_prefix}/Tensile
-                    ./tuning/scripts/provision_tuning.sh -w tt -z logs/${log} -o output.yaml -y sgemm -l vega20
+                    cd ${project.paths.project_build_prefix}
+                    cp -r logs Tensile 
+                    cd Tensile
+                    ./tuning/scripts/provision_tuning.sh -w tt -z logs/${log} -o ${filename}.yaml -y sgemm -l vega20
                 """
         
         platform.runCommand(this, command)
