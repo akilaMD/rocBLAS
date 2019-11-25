@@ -1,0 +1,60 @@
+#!/usr/bin/env groovy
+// This shared library is available at https://github.com/ROCmSoftwarePlatform/rocJENKINS/
+@Library('rocJenkins@tuning') _
+
+// This is file for internal AMD use.
+// If you are interested in running your own Jenkins, please raise a github issue for assistance.
+
+import com.amd.project.*
+import com.amd.docker.*
+import com.amd.tuning.*
+
+import java.nio.file.Path;
+
+tuningCI:
+{
+
+    def tuning = new rocProject('Tuning')
+
+    // Define test architectures, optional rocm version argument is available
+    def nodes = new dockerNodes(['ubuntu18 && mi25', 'ubuntu18 && mi50', 'ubuntu18 && mi60', 'ubuntu18 && v340'], tuning)
+
+    def setupCommand =
+    {
+        platform, project->
+
+        project.paths.construct_build_prefix()
+        
+        def tensile = platform.checkoutSecondaryProject("Tensile")
+        def remote = project.tune.addRemote("Tensile","amdkila","local")
+        def command = """#!/usr/bin/env bash
+                    set -x
+                    cd ${project.paths.project_build_prefix}
+                    ${remote}
+                    git checkout -b ${new_branch}
+                    git clone ${tensile}
+                    """
+        
+        platform.runCommand(this, command)
+    }
+
+    def provisionCommand =
+    {
+        platform, project->
+
+        project.paths.construct_build_prefix()
+
+        String log = "*"
+        def command = """#!/usr/bin/env bash
+                    set -x
+                    cd ${project.paths.project_build_prefix}/Tensile
+                    ./tuning/scripts/provision_tuning.sh -w tt -z logs/${log} -o output.yaml -y sgemm -l vega20
+                """
+        
+        platform.runCommand(this, command)
+    }
+
+    runTuning(tuning, nodes.dockerArray, setupCommand, provisionCommand, tensileCommand, rocblasCommand, analysisCommand, githubCommand)
+
+}
+
