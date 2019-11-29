@@ -17,9 +17,10 @@ tuningCI:
     def tuning = new rocProject('Tuning')
 
     // Define test architectures, optional rocm version argument is available
-    def nodes = new dockerNodes(['ubuntu18 && mi25', 'ubuntu18 && mi50', 'ubuntu18 && mi60', 'ubuntu18 && v340'], tuning)
+    def nodes = new dockerNodes(['tuning && ubuntu18 && v340'], tuning)
 
     String user = "amdkila"
+    String branch = random_string_func
 
     def setupCommand =
     {
@@ -29,7 +30,6 @@ tuningCI:
         
         def tensile = platform.checkoutSecondaryProject("Tensile")
         String remote = project.tune.addRemote("Tensile",user,"local")
-        String branch = project.tune.random()
 
         def command = """#!/usr/bin/env bash
                     set -x
@@ -48,20 +48,99 @@ tuningCI:
 
         project.paths.construct_build_prefix()
 
-        String log = "*"
-        String filename = project.tune.getFilenames("${project.paths.project_build_prefix}/Tensile")
+        def filename = project.tune.getFilename(project.paths.project_build_prefix)
+        String dataType = project.tune.getDataType("${project.paths.project_build_prefix}/Tensile",filename[1])
+        String gpu = project.tune.getGpu(platform.jenkinsLabel)
+
         def command = """#!/usr/bin/env bash
                     set -x
                     cd ${project.paths.project_build_prefix}
-                    cp -r logs Tensile 
+                    cp -r performance/logs Tensile 
                     cd Tensile
-                    ./tuning/scripts/provision_tuning.sh -w tt -z logs/${log} -o ${filename}.yaml -y sgemm -l vega20
+                    ./tuning/scripts/provision_tuning.sh -w tt -z logs/${filename[0]}.yaml -o ${filename[1]}.yaml -y ${dataType} -l ${gpu}
                 """
         
         platform.runCommand(this, command)
     }
 
+    def tensileCommand =
+    {
+        platform, project->
+
+        project.paths.construct_build_prefix()
+        def command = """#!/usr/bin/env bash
+                    set -x
+                    cd ${project.paths.project_build_prefix}/Tensile/tt/tensile/Tensile
+                    export PATH=/opt/rocm/bin:/home/jenkins/.local/bin:$PATH
+                    ./doit-all.sh
+                """
+        platform.runCommand(this, command)
+    }
+
+    def rocblasCommand =
+    {
+        platform, project->
+
+        project.paths.construct_build_prefix()
+        
+        //fix hard-coded vega10
+        def command = """#!/usr/bin/env bash
+                    set -x
+                    cd ${project.paths.project_build_prefix}/Tensile
+                    ./tuning/scripts/provision_verification.sh -w v -r tt/tensile/Tensile
+                """
+        platform.runCommand(this, command)
+    }
+
+    def analysisCommand =
+    {
+        platform, project->
+
+        project.paths.construct_build_prefix()
+        
+        def stagingDir = project.tune.stageDirs()
+        
+        //move some of these to a script
+        def command = """#!/usr/bin/env bash
+                    set -x
+                    cd ${project.paths.project_build_prefix}/Tensile
+                    cp tt/scripts/* ${stagingDir[0]}
+                    cp tt/scripts/* ${stagingDir[1]}
+                    pushd ${stagingDir[0]}
+                    ./doit_all.sh
+                    popd
+                    pushd ${stagingDir[1]}
+                    ./doit_all.sh
+                    popd
+                    ./tuning/scripts/analyze-results.sh -o analysis -s 2 -f 1301 -r ${stagingDir[0]}/results -b ${stagingDir[1]}/results
+                """
+        platform.runCommand(this, command)
+    }
+
+    def githubCommand =
+    {
+        platform, project->
+
+        project.paths.construct_build_prefix()
+
+        //try and move some of this to a script, and figure out git credential issues
+        def command = """#!/usr/bin/env bash
+                    set -x
+                    cd ${project.paths.project_build_prefix}/Tensile
+                    pushd ..
+                    git status
+                    popd
+                    cp v/library/merge/* ../library/src/blas3/Tensile/Logic/archive
+                    cp v/library/massage/* ../library/src/blas3/Tensile/Logic/asm_full
+                    cp v/library/massage/* ../library/src/blas3/Tensile/Logic/asm_ci
+                    mv tt/scripts/doit_all.sh .
+                    cp tt/scripts/* ../scripts/performance
+                    cd ..
+                    git add library/* scripts/*
+                    git commit -m "Add tuned configs"
+                    git push origin ${branch}
+                """
+    }
+
     runTuning(tuning, nodes.dockerArray, setupCommand, provisionCommand, tensileCommand, rocblasCommand, analysisCommand, githubCommand)
-
 }
-
