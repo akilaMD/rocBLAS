@@ -20,7 +20,7 @@ tuningCI:
     def nodes = new dockerNodes(['tuning && ubuntu18 && v340'], tuning)
 
     String user = "amdkila"
-    String branch = random_string_func
+    String branch = org.apache.commons.lang.RandomStringUtils.random(9, true, true)
 
     def setupCommand =
     {
@@ -100,7 +100,6 @@ tuningCI:
         
         def stagingDir = project.tune.stageDirs()
         
-        //move some of these to a script
         def command = """#!/usr/bin/env bash
                     set -x
                     cd ${project.paths.project_build_prefix}/Tensile
@@ -115,6 +114,8 @@ tuningCI:
                     ./tuning/scripts/analyze-results.sh -o analysis -s 2 -f 1301 -r ${stagingDir[0]}/results -b ${stagingDir[1]}/results
                 """
         platform.runCommand(this, command)
+        platform.archiveArtifacts(this, "${project.paths.project_build_prefix}/Tensile/tt/scripts")
+        platform.archiveArtifacts(this, "${project.paths.project_build_prefix}/Tensile/analysis/final")
     }
 
     def githubCommand =
@@ -123,7 +124,6 @@ tuningCI:
 
         project.paths.construct_build_prefix()
 
-        //try and move some of this to a script, and figure out git credential issues
         def command = """#!/usr/bin/env bash
                     set -x
                     cd ${project.paths.project_build_prefix}/Tensile
@@ -140,6 +140,7 @@ tuningCI:
                     git commit -m "Add tuned configs"
                     git push origin ${branch}
                 """
+        platform.runCommand(this, command)
     }
 
     runTuning(tuning, nodes.dockerArray, setupCommand, provisionCommand, tensileCommand, rocblasCommand, analysisCommand, githubCommand)
