@@ -17,9 +17,9 @@ endif()
 project( rocblas-clients LANGUAGES CXX )
 
 if(OS_ID_rhel OR OS_ID_centos OR OS_ID_sles)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libgomp -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libgomp -pthread -fno-builtin")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -pthread -fno-builtin")
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)

@@ -9,9 +9,9 @@ set( Boost_ADDITIONAL_VERSIONS 1.65.1 1.65 )
 set( Boost_USE_STATIC_LIBS OFF )
 
 if(EXISTS /etc/redhat-release)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libgomp -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libgomp -pthread -fno-builtin")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -pthread -fno-builtin")
 endif()
 
 find_package( Boost COMPONENTS program_options )

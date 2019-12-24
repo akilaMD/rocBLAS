@@ -486,6 +486,7 @@ pushd .
   if [[ "${build_cuda}" == true || "${build_hip_clang}" == true ]]; then
     compiler="hipcc"
     cmake_common_options="${cmake_common_options} -DTensile_COMPILER=hipcc"
+    elevate_if_not_root apt install llvm-6.0-dev
   fi
 
 

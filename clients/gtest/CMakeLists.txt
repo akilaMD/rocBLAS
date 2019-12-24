@@ -4,7 +4,7 @@
 
 # For debugging, uncomment this
 # set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -O0" )
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -fno-builtin")
 
 # set( Boost_DEBUG ON )
 set( Boost_USE_MULTITHREADED ON )
